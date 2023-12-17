@@ -35,7 +35,7 @@ namespace HotelProject.Controllers
 
             DataTable dt = ReportLogic.Instance.Product_Report(state,startdate,enddate);
 
-            dt.TableName = "Datos";
+            dt.TableName = "Report_Products";
             using (XLWorkbook wb = new XLWorkbook())
             {
                 wb.Worksheets.Add(dt);
@@ -53,7 +53,7 @@ namespace HotelProject.Controllers
 
             DataTable dt = ReportLogic.Instance.Reception_Report(roomid, startdate, enddate);
 
-            dt.TableName = "Datos";
+            dt.TableName = "Report_Reception";
             using (XLWorkbook wb = new XLWorkbook())
             {
                 wb.Worksheets.Add(dt);

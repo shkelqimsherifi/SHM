@@ -42,7 +42,7 @@ namespace HotelProject.Logic
                     StringBuilder sb = new StringBuilder();
 
                     sb.AppendLine("SET DATEFORMAT dmy;");
-                    sb.AppendLine("select ProductName, Details, Price, Amount, iif(State_text = 1, 'Active', 'No Active')[State_text],CONVERT(char(10),CreationDate,103)[CreationDate] from PRODUCT");
+                    sb.AppendLine("select ProductName, Details, Price, Amount, if(State_text = 1, 'Active', 'No Active')[State_text],CONVERT(char(10),CreationDate,103)[CreationDate] from PRODUCT");
                     sb.AppendLine("where State_text = iif(@state_text = 2, State_text, @state_text) and convert(date,CreationDate) between @startDate and @endDate");
 
                     SqlCommand cmd = new SqlCommand(sb.ToString(), oConnection);
