@@ -1,0 +1,144 @@
+﻿@model HotelProject.Models.Reception
+
+@{
+    ViewBag.Title = "DetailReception";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Room Summary</h6>
+        <hr class="mt-1 mb-1" />
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Number:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.Number)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Details:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.Details)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Category:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.oCategory.Description_text)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Floor:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.oHotelFloor.Description_text)</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Customer:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.PersonName) @Html.DisplayTextFor(model => model.oPerson.LastName)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Document No.:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.Document)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Mail:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.Mail)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Entry date:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.EntryDateText)</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Accommodation Details</h6>
+        <hr class="mt-1 mb-1" />
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Room Cost:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.StartingPrice)" disabled="disabled">
+
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Advance Amount:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.Advancement)" disabled="disabled">
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Remaining amount:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.RemainingPrice)" disabled="disabled">
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Departure date:</label>
+                <input type="text" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.DepartureDateText)" disabled="disabled">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Room service</h6>
+        <hr class="mt-1 mb-2" />
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Unit price</th>
+                            <th>Sale Status</th>
+                            <th>Sub Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model.oSale != null)
+                            {
+
+                                foreach (var venta in Model.oSale)
+                                {
+                                    foreach (var saledetail in venta.oSaleDetail)
+                                    {
+                                        <tr>
+                                            <td>@saledetail.oProduct.ProductName</td>
+                                            <td>@saledetail.Amount</td>
+                                            <td>@saledetail.oProduct.Price</td>
+                                            <td>
+                                                @{
+                                                    if (venta.State_text == "Cancelled")
+                                                    {
+                                                        <span class="badge badge-success p-2">@venta.State_text</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-danger p-2">@venta.State_text</span>
+                                                    }
+                                                }
+
+                                            </td>
+                                            <td>@saledetail.SubTotal</td>
+                                        </tr>
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="alert alert-secondary border-0" role="alert">
+                                            No records found
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

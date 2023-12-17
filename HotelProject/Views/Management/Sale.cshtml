@@ -1,0 +1,258 @@
+﻿@model HotelProject.Models.Reception
+
+@{
+    ViewBag.Title = "Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<input type="hidden" value="@Html.DisplayTextFor(model => model.ReceptionId)" id="txtidreception" />
+<div class="card shadow-sm">
+    <div class="card-body  p-3">
+        <input type="hidden" value="@Html.DisplayTextFor(model => model.oRoom.RoomId)" id="txtidroom" />
+        <h6 class="card-title font-weight-bold text-primary">Room Summary</h6>
+
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Number:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.Number)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Details:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.Details)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Category:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.oCategory.Description_text)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Floor:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oRoom.oHotelFloor.Description_text)</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Customer:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.PersonName) @Html.DisplayTextFor(model => model.oPerson.LastName)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Nro. Document:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.Document)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Mail:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oPerson.Mail)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Entry date:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.EntryDate)</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3 shadow-sm">
+    <div class="card-header card-title font-weight-bold text-primary">
+        Sale detail
+    </div>
+    <div class="card-body p-3">
+        <div class="form-row align-items-end">
+            <div class="col-md-3">
+                <label for="validationCustom01">Product:</label>
+                <select id="cboproduct" class="form-control"></select>
+            </div>
+            <div class="col-md-2">
+                <label for="validationCustom01">Price:</label>
+                <input type="text" class="form-control" id="txtprice" disabled="disabled">
+            </div>
+            <div class="col-md-2">
+                <label for="validationCustom01">Amount</label>
+                <input type="number" class="form-control" id="txtamount" value="1" min="1" max="10">
+            </div>
+            <div class="col-md-2">
+                <button id="btnaddproduct" class="btn btn-success btn-block" type="button">Add</button>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered table-sm" id="tbsale">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th></th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Unit price</th>
+                            <th scope="col">Sub Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-3 align-self-end">
+                <table class="table table-sm border-dark border-right border-top border-bottom">
+                    <tr>
+                        <td class="bg-dark text-white">Total Pay</td>
+                        <td><label id="lbltotalpay" class="m-0">0</label></td>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+        <hr />
+        <div class="row justify-content-end">
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Sale Status</label>
+                    </div>
+                    <select class="custom-select" id="cbostatesale">
+                        <option value="Pending">Pending</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-2">
+                <button id="btnfinalizesale" class="btn btn-primary btn-block" type="button">Complete Sale</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        var tabledata;
+
+        $(document).ready(function () {
+
+            jQuery.ajax({
+                url: '@Url.Action("ListProduct", "Store")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.ProductID }).data("price",value.Price).text(value.ProductName).appendTo("#cboproduct");
+                    });
+                    $("#cboproduct").val($("#cboproduct option:first").val());
+                    $("#cboproduct").trigger("change");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        });
+
+
+        $("#cboproduct").on("change", function (e) {
+            var price = $("#cboproduct option:selected").data("price");
+            $("#txtprice").val(parseFloat(price).toFixed(2));
+            $("#txtamount").val(1);
+        })
+
+        $("#btnaddproduct").on("click", function (e) {
+
+            var product_exists = false;
+
+            $('#tbsale > tbody  > tr').each(function (e) {
+                if ($("#cboproduct option:selected").val() == $(this).data("productid")) {
+                    product_exists = true;
+                    return false;
+                }
+            });
+
+            if (!product_exists) {
+                $("#tbsale").append(
+                    $("<tr>").append(
+                        $("<td>").append(
+                            $("<button>").addClass("btn btn-outline-danger btn-sm remove-product").attr({ "type": "button" }).append($("<i>").addClass("fas fa-trash"))
+                        ).attr({ "align": "center" }),
+                        $("<td>").text($("#cboproduct option:selected").text()),
+                        $("<td>").text($("#txtamount").val()),
+                        $("<td>").text(parseFloat($("#txtprice").val()).toFixed(2)),
+						$("<td>").text(parseFloat(parseFloat($("#txtamount").val()) * parseFloat($("#txtprice").val())).toFixed(2)),
+                    ).data("productid", $("#cboproduct option:selected").val())
+                )
+                calculateTotalPay();
+            }
+        })
+
+        $(document).on("click",".remove-product", function (e) {
+            $(this).parents("tr").remove();
+            calculateTotalPay()
+        })
+        
+        function calculateTotalPay() {
+            var total = 0;
+            $('#tbsale > tbody  > tr').each(function (e) {
+                total += parseFloat($(this).find("td:eq(4)").text());
+            });
+            $("#lbltotalpay").text(parseFloat(total).toFixed(2));
+            console.log(total);
+        }
+
+
+
+        $("#btnfinalizesale").on("click", function (e) {
+
+            var saledetail = [];
+            $('#tbsale > tbody  > tr').each(function (e) {
+                saledetail.push(
+                    {
+                        oProduct: { ProductID: $(this).data("productid") },
+                        Amount : parseInt($(this).find("td:eq(2)").text()),
+                        SubTotal : parseFloat($(this).find("td:eq(4)").text())
+                    }
+                )
+            });
+
+
+            var request = {
+                obj: {
+                    oReception: { ReceptionId: $("#txtidreception").val() },
+                    Total: parseFloat($("#lbltotalpay").text()),
+					State_text: $("#cbostatesale option:selected").val(),
+                    oSaleDetail: saledetail
+                }
+            }
+
+            
+            jQuery.ajax({
+                url: '@Url.Action("RegisterSale", "Store")',
+                type: "POST",
+                data: JSON.stringify(request),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.result) {
+                        $("#tbsale tbody tr").remove();
+                        $("#lbltotalpay").text("0");
+                        $("#cbostatesale").val($("#cbostatesale option:first").val());
+                        $("#cboproduct").val($("#cboproduct option:first").val());
+                        $("#cboproduct").trigger("change");
+                        swal("List", "The sale was registered", "success");
+                    } else {
+                        swal("We are sorry", "The sale could not be completed", "warning");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+        })
+        
+
+    </script>
+
+}

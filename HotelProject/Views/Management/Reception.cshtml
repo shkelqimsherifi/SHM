@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewBag.Title = "Reception";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="form-group row">
+            <label for="inputPassword" class="col-sm-2 col-form-label">Select Floor</label>
+            <div class="col-sm-4">
+                <select class="form-control" id="cbofloor"></select>
+            </div>
+        </div>
+        <hr />
+        <div id="rooms" class="row">
+        
+
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        var tabledata;
+
+        $(document).ready(function () {
+            jQuery.ajax({
+                url: '@Url.Action("ListFloor", "Maintenance")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "0"}).text("All").appendTo("#cbofloor");
+
+                    $.each(data.data, function (index, value) {
+						$("<option>").attr({ "value": value.FloorId }).text(value.Description_text).appendTo("#cbofloor");
+                    });
+                    $("#cbofloor").val($("#cbofloor option:first").val());
+                    $("#cbofloor").trigger("change");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        });
+
+        $("#cbofloor").on("change", function (e) {
+
+            jQuery.ajax({
+				url: '@Url.Action("ListRoom", "Management")' + '?floorid=' + $("#cbofloor option:selected").val() ,
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    $("#rooms").html("");
+                    $.each(data.data, function (index, value) {
+                        var classs = "";
+                        var icono = "";
+						switch (value.oRoomState.IdStateRoom) {
+                            case 1:
+                                classs = "success";
+                                icon = "fas fa-box";
+                                break;
+                            case 2:
+                                classs = "danger";
+                                icon = "fas fa-bed";
+                                break;
+                            default:
+                                classs = "info";
+                                icono = "fas fa-air-freshener";
+                        }
+
+                        $("<div>").addClass("col-xl-3 col-md-6 mb-4").append(
+                            $("<div>").addClass("card border-" + classs + " rounded-0").append(
+                                $("<div>").addClass("card-body").append(
+                                    $("<div>").addClass("row no-gutters align-items-center").append(
+                                        $("<div>").addClass("col mr-2").append(
+											$("<div>").addClass("h5 mb-0 font-weight-bold text-gray-800").text("NRO: " + value.Number),
+											$("<div>").addClass("text-xs font-weight-bold text-" + classs + " text-uppercase mb-1 mt-1").text("Category: " + value.oCategory.Description_text),
+                                        ),
+                                        $("<div>").addClass("col-auto").append(
+                                            $("<i>").addClass(icono + " fa-2x text-" + classs)
+                                        )
+                                    )
+                                ),
+                                $("<div>").addClass("card-footer d-flex bg-" + classs + " align-items-center justify-content-between rounded-0").append(
+									$("<a>").addClass("small text-white stretched-link text-uppercase font-weight-bold select-room").text(value.oRoomState.Description_text).data("info", JSON.stringify({ RoomId: value.RoomId, IdStateRoom: value.oRoomState.IdStateRoom })),
+                                    $("<div>").addClass("small text-white").append($("<i>").addClass("fas fa-angle-right"))
+                                )
+                            )
+                        ).appendTo("#rooms");
+                    });
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        })
+
+        //TODO: Fix the error to accept Room is clean.
+        $(document).on('click', '.select-room', function (event) {
+            var json = JSON.parse( $(this).data("info"))
+			if (json.IdStateRoom == 1) {
+				window.location.href = "@Url.Action("ReceptionRegistration", "Management")" + "?roomid=" + json.RoomId
+			} else if (json.IdStateRoom == 2) {
+				window.location.href = "@Url.Action("DetailReception", "Management")" + "?roomid=" + json.RoomId
+			} else if (json.IdStateRoom == 3) {
+
+                swal({
+                  title: "Finish Cleaning",
+                  text: "Next the status of the room will be AVAILABLE",
+                  icon: "warning",
+                  buttons: ["Cancel", "Accept"]
+                })
+                .then((result) => {
+                    if (result) {
+                        jQuery.ajax({
+							url: '@Url.Action("UpdateRoomStatus", "Management")' + "?roomid=" + json.RoomId + "&idstateroom_text=1",
+                            type: "GET",
+                            data: null,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                $("#cbofloor").trigger("change");
+                            },
+                            error: function (error) {
+                                console.log(error)
+                            }
+                        });
+                    } 
+                });
+
+            }
+            console.log(json);
+            
+        });
+      
+    </script>
+
+}
