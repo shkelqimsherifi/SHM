@@ -45,9 +45,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sql Server\001_CREACION BASE DATOS Y TABLAS.sql" />
-    <Content Include="Sql Server\002_CREACION PROCEDIMIENTOS.sql" />
-    <Content Include="Sql Server\003_INSERTAR DATOS.sql" />
+    <Content Include="Sql Server\001_CREAT DATABASE.sql" />
+    <Content Include="Sql Server\002_CREATE PROC.sql" />
+    <Content Include="Sql Server\003_INSERT DATA.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
